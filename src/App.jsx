@@ -6,12 +6,21 @@ import Log from "./components/Log.jsx";
 import GameOver from "./components/GameOver.jsx";
 import { WINNING_COMBINATIONS } from "./winning-combinations.js";
 
+
+/**
+ * DEFAULT PLAYER NAME
+ */
+const PLAYERS = {
+  X: 'Player 1',
+  O: 'Player 2'
+}
+
 /**
  * DEFAULT BLANK GAME BOARD ARRAY
  * DO NOT MUTATE IT
  * INSTEAD USE DEEP COPY ONE
  */
-const initialGameBoard = [
+const INITIAL_GAME_BOARD = [
   [null, null, null],
   [null, null, null],
   [null, null, null],
@@ -31,18 +40,12 @@ const deriveActivePlayer = (gameTurns) => {
   return currentPlayer;
 };
 
-function App() {
-  const [players, setPlayers] = useState({
-    X: "Player 1",
-    O: "Player 2",
-  });
-  const [gameTurns, setGameTurns] = useState([]);
-
-  // Update player data
-  const activePlayer = deriveActivePlayer(gameTurns);
-
-  // Update game board data
-  let gameBoard = [...initialGameBoard.map((array) => [...array])];
+/**
+ * UPDATE GAME BOARD INFO FUNCTION
+ * BASED ON THE STATE (= gameTurns)
+ */
+const deriveGameBoard = (gameTurns) => {
+  let gameBoard = [...INITIAL_GAME_BOARD.map((array) => [...array])];
 
   for (const turn of gameTurns) {
     const { square, player } = turn;
@@ -51,7 +54,13 @@ function App() {
     gameBoard[row][col] = player;
   }
 
-  // Checking whether winner condition is satisfied or not
+  return gameBoard;
+}
+
+/**
+ * STORE WINNER FUNCTION
+ */
+const deriveWinner = (gameBoard, players) => {
   let winner;
 
   for (const combination of WINNING_COMBINATIONS) {
@@ -71,6 +80,23 @@ function App() {
     }
   }
 
+  return winner;
+}
+
+// =====================================================================
+
+function App() {
+  const [players, setPlayers] = useState(PLAYERS);
+  const [gameTurns, setGameTurns] = useState([]);
+
+  // Update player data
+  const activePlayer = deriveActivePlayer(gameTurns);
+
+  // Update game board data
+  const gameBoard = deriveGameBoard(gameTurns);
+
+  // Checking whether winner condition is satisfied or not
+  const winner = deriveWinner(gameBoard, players);
   const hasDraw = gameTurns.length === 9 && !winner;
 
   /**
@@ -114,13 +140,13 @@ function App() {
       <div id="game-container">
         <ol id="players" className="highlight-player">
           <Player
-            initialName="Player-1"
+            initialName={PLAYERS.X}
             symbol="X"
             isActive={activePlayer === "X"}
             onChangeName={playerNameChangeHandler}
           />
           <Player
-            initialName="Player-2"
+            initialName={PLAYERS.O}
             symbol="O"
             isActive={activePlayer === "O"}
             onChangeName={playerNameChangeHandler}

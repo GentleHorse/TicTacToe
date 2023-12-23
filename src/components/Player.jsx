@@ -12,6 +12,8 @@ export default function Player({
   const editNameHandler = () => {
     setIsEditing((isEditing) => !isEditing);
 
+    // When the status changes from "Edit" to "Save"
+    // Fetch old state (isEditing = true)
     if (isEditing) {
       onChangeName(symbol, playerName);
     }
